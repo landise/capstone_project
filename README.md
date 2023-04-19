@@ -17,10 +17,10 @@ Finally, we will visualize the data to get a holistic view of the relationship b
 ## Instructions
 To reproduce the results, run the code files in the following order - 
 
-1. 1_Data_Collection_US_Weekly.ipynb in PYTHON
-2. 2_Sentiment Analysis Modeling.ipynb in PYTHON
-3. 3_monthly_fin_data.ipynb in PYTHON
-4. 4_linear_model_prep.ipynb in PYTHON
-5. 5_R_model.Rmd in R
+1. `1_Data_Collection_US_Weekly.ipynb` in PYTHON
+2. `2_Sentiment Analysis Modeling.ipynb` in PYTHON
+3. `3_monthly_fin_data.ipynb` in PYTHON
+4. `4_linear_model_prep.ipynb` in PYTHON
+5. `5_R_model.Rmd in R
 
-All the intermediate data files are uploaded. To see the final regression model, run the 4_linear_model_prep.ipynb file.
+All the intermediate data files are uploaded. The final linear regression model can be viewed without any dependencies in `R_model.html`.
