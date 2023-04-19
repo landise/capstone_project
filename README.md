@@ -4,7 +4,6 @@ Are Celebrity Endorsements Worth The Money?
 - Nitanshi Mahajan and Emily Schemanske
 
 ## Abstract
-Are celebrity endorsements worth the money? 
 
 Many companies use celebrities to promote their products; a wise move since, according to Forbes, a company could see as much as a 4% increase in sales almost immediately after an endorsement deal is signed (Olenski). At the same time, these lucrative deals are not without risk. Recent public scandals and the rise of “cancel culture” have  raised questions about the potential financial impact on companies when things go wrong.
 
