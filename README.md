@@ -22,4 +22,4 @@ To rreproduce the results, run the code files in the following order -
 3. 3_monthly_fin_data.ipynb
 4. 4_linear_model_prep.ipynb
 
-All the intermediate data files are uploaded to see the regression model, directly run the 4_linear_model_prep.ipynb file.
+All the intermediate data files are uploaded. To see the final regression model, run the 4_linear_model_prep.ipynb file.
