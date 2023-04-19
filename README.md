@@ -15,11 +15,12 @@ Our first task is to quantify a “scandal”. We will do this by applying Natur
 Finally, we will visualize the data to get a holistic view of the relationship between celebrity and company. For this case study, we will look at the nine year long partnership of Kanye West and Adidas.
 
 ## Instructions
-To rreproduce the results, run the code files in the following order - 
+To reproduce the results, run the code files in the following order - 
 
-1. 1_Data_Collection_US_Weekly.ipynb
-2. 2_Sentiment Analysis Modeling.ipynb
-3. 3_monthly_fin_data.ipynb
-4. 4_linear_model_prep.ipynb
+1. 1_Data_Collection_US_Weekly.ipynb in PYTHON
+2. 2_Sentiment Analysis Modeling.ipynb in PYTHON
+3. 3_monthly_fin_data.ipynb in PYTHON
+4. 4_linear_model_prep.ipynb in PYTHON
+5. 5_R_model.Rmd in R
 
 All the intermediate data files are uploaded. To see the final regression model, run the 4_linear_model_prep.ipynb file.
