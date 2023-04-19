@@ -1,4 +1,4 @@
- #Capstone Project - SI 699
+ # Capstone Project - SI 699
  
 Are Celebrity Endorsements Worth The Money?
 - Nitanshi Mahajan and Emily Schemanske
