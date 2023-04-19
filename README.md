@@ -21,6 +21,6 @@ To reproduce the results, run the code files in the following order -
 2. `2_Sentiment Analysis Modeling.ipynb` in PYTHON
 3. `3_monthly_fin_data.ipynb` in PYTHON
 4. `4_linear_model_prep.ipynb` in PYTHON
-5. `5_R_model.Rmd' in R
+5. `5_R_model.Rmd` in R
 
 All the intermediate data files are uploaded. The final linear regression model can be viewed without any dependencies in `R_model.html`.
