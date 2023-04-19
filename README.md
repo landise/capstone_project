@@ -23,4 +23,4 @@ To reproduce the results, run the code files in the following order -
 4. `4_linear_model_prep.ipynb` in PYTHON
 5. `5_R_model.Rmd` in R
 
-All the intermediate data files are uploaded. The final linear regression model can be viewed without any dependencies in `R_model.html`.
+All the intermediate data files are uploaded. The final linear regression model can be viewed without any dependencies in `R_model.pdf`.
