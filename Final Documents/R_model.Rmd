@@ -1,0 +1,218 @@
+---
+title: "Linear Models"
+author: "Emily Schemanske & Nitanshi Mahajan"
+date: "4/15/2023"
+output: html_document
+---
+
+# Hugging Face BERTweet sentiment model
+
+```{r}
+# read huggingface data
+data_hf = read.csv('/Users/landise/Downloads/lm_huggingface.csv')
+
+# remove date column
+data_hf <- subset(data_hf, select = c(adidas_PercentChangeMA, djia_PercentChangeMA, final_score_MA, pn_score_MA))
+data_hf <- na.omit(data_hf)
+
+head(data_hf)
+```
+```{r}
+# scale pn_score_MA so all values are between 0 and 1
+data_hf$pn_score_MA <- (data_hf$pn_score_MA - min(data_hf$pn_score_MA)) / (max(data_hf$pn_score_MA) - min(data_hf$pn_score_MA))
+head(data_hf, 1000)
+```
+
+```{r}
+# univariate model for reference
+base_mod_hf <- lm(adidas_PercentChangeMA ~ djia_PercentChangeMA, data=data_hf)
+summary(base_mod_hf)
+```
+
+```{r}
+# check model with all predictors
+hf_full <- lm(adidas_PercentChangeMA ~ ., data=data_hf)
+summary(hf_full)
+```
+
+```{r}
+# delete insignificant predictor
+hf_mod <- lm(adidas_PercentChangeMA ~ djia_PercentChangeMA + pn_score_MA, data=data_hf)
+summary(hf_mod)
+```
+
+
+# NLTK VADER sentiment model
+
+```{r}
+# load nltk scores
+d = read.csv('/Users/landise/Downloads/lm.csv')
+
+# remove date column
+data <- subset(d, select = c(adidas_PercentChangeMA, djia_PercentChangeMA, nltk_positive_MA, nltk_negative_MA, nltk_neutral_MA, nltk_compound_MA))
+head(data)
+```
+
+```{r}
+# same base model as before
+base_mod <- lm(adidas_PercentChangeMA ~ djia_PercentChangeMA, data=data)
+summary(base_mod)
+```
+
+```{r}
+# check full model
+nltk_full = lm(adidas_PercentChangeMA ~ ., data=data)
+summary(nltk_full)
+```
+
+```{r}
+# delete most insignificant pred
+nltk_less1 = lm(adidas_PercentChangeMA ~ djia_PercentChangeMA + nltk_negative_MA + nltk_neutral_MA + nltk_compound_MA, data=data)
+summary(nltk_less1)
+```
+
+All predictors are significant.
+
+# Diagnostics
+
+## Plots
+
+```{r}
+plot(nltk_less1)
+```
+
+
+```{r}
+# lag plot to check for autocorrelation
+n <- length(residuals(nltk_full))
+plot(tail(residuals(nltk_full), n-1) ~ head(residuals(nltk_full), n-1), xlab=expression(hat(epsilon)[i]), ylab=expression(hat(epsilon)[i+1]))
+abline(h=0, v=0, col=grey(0.75))
+```
+There is strong evidence of autocorrelation - not uncommon in time series.
+
+## Transform the predictors
+
+```{r}
+library(car)
+durbinWatsonTest(nltk_less1)
+```
+
+p-value indiates strong evidence of autocorrelation.
+
+```{r}
+# another package for DW test
+library(orcutt)
+dwtest(nltk_less1)
+```
+
+Source: https://rpubs.com/apricitea/handling-autocorrelation
+
+### NLTK final model transformation
+
+```{r}
+# get best RHO for transformation
+mod_transformed <- cochrane.orcutt(nltk_less1, convergence=5, max.iter=1000)
+mod_transformed
+```
+
+
+```{r}
+# transform predictors and target
+rho <- mod_transformed$rho
+y.trans <- data$adidas_PercentChangeMA[-1]-data$adidas_PercentChangeMA[-309]*rho
+x.trans <- (data$djia_PercentChangeMA)[-1]-(data$djia_PercentChangeMA)[-309]*rho
+x1.trans <- (data$nltk_negative_MA)[-1]-(data$nltk_negative_MA)[-309]*rho
+x2.trans <- (data$nltk_neutral_MA)[-1]-(data$nltk_neutral_MA)[-309]*rho
+x3.trans <- (data$nltk_compound_MA)[-1]-(data$nltk_compound_MA)[-309]*rho
+
+# model with transformed preds
+mod_transformed <- lm(y.trans ~ x.trans + x1.trans + x2.trans + x3.trans)
+summary(mod_transformed)
+```
+
+```{r}
+dwtest(mod_transformed)
+```
+
+p-value near 1 indicates we have fixed the issue of autocorrelation
+
+```{r}
+n <- length(residuals(mod_transformed))
+plot(tail(residuals(mod_transformed), n-1) ~ head(residuals(mod_transformed), n-1), xlab=expression(hat(epsilon)[i]), ylab=expression(hat(epsilon)[i+1]))
+abline(h=0, v=0, col=grey(0.75))
+```
+Plot shows no more evidence of autocorrelation.
+
+## Select final vars
+
+```{r}
+summary(mod_transformed)
+```
+
+```{r}
+# y.trans <- data$adidas_PercentChangeMA[-1]-data$adidas_PercentChangeMA[-309]*rho
+# x.trans <- (data$djia_PercentChangeMA)[-1]-(data$djia_PercentChangeMA)[-309]*rho
+# x1.trans <- (data$nltk_negative_MA)[-1]-(data$nltk_negative_MA)[-309]*rho
+# x2.trans <- (data$nltk_neutral_MA)[-1]-(data$nltk_neutral_MA)[-309]*rho
+# x3.trans <- (data$nltk_compound_MA)[-1]-(data$nltk_compound_MA)[-309]*rho
+
+mod_transformed <- lm(y.trans ~ x.trans + x2.trans + x3.trans)
+summary(mod_transformed)
+```
+
+```{r}
+mod_transformed <- lm(y.trans ~ x.trans + x3.trans)
+summary(mod_transformed)
+```
+
+## Try full model transformation
+
+```{r}
+full_transformed <- cochrane.orcutt(nltk_full, convergence=5, max.iter=1000)
+full_transformed
+```
+
+```{r}
+rho <- full_transformed$rho
+y.trans <- data$adidas_PercentChangeMA[-1]-data$adidas_PercentChangeMA[-309]*rho
+x.trans <- (data$djia_PercentChangeMA)[-1]-(data$djia_PercentChangeMA)[-309]*rho
+x1.trans <- (data$nltk_negative_MA)[-1]-(data$nltk_negative_MA)[-309]*rho
+x2.trans <- (data$nltk_neutral_MA)[-1]-(data$nltk_neutral_MA)[-309]*rho
+x3.trans <- (data$nltk_compound_MA)[-1]-(data$nltk_compound_MA)[-309]*rho
+x4.trans <- (data$nltk_positive_MA)[-1]-(data$nltk_positive_MA)[-309]*rho
+
+full_transformed <- lm(y.trans ~ x.trans + x1.trans + x2.trans + x3.trans + x4.trans)
+summary(full_transformed)
+```
+
+```{r}
+full_transformed <- lm(y.trans ~ x.trans + x1.trans + x2.trans + x4.trans)
+summary(full_transformed)
+```
+
+```{r}
+full_transformed <- lm(y.trans ~ x.trans + x1.trans + x4.trans)
+summary(full_transformed)
+```
+
+```{r}
+full_transformed <- lm(y.trans ~ x.trans + x1.trans)
+summary(full_transformed)
+```
+
+```{r}
+plot(full_transformed)
+```
+
+```{r}
+n <- length(residuals(full_transformed))
+plot(tail(residuals(full_transformed), n-1) ~ head(residuals(full_transformed), n-1), xlab=expression(hat(epsilon)[i]), ylab=expression(hat(epsilon)[i+1]))
+abline(h=0, v=0, col=grey(0.75))
+```
+
+```{r}
+base_transformed <- lm(y.trans ~ x.trans)
+summary(base_transformed)
+```
+
+Both models show simliar results.
